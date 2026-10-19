@@ -34,6 +34,7 @@ public class Produit {
     @OneToMany(
             mappedBy = "produit",
             cascade = CascadeType.PERSIST
+
     )
     private List<LigneCommande> ligneCommande = new ArrayList<>();
 

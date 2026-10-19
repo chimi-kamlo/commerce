@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "categories")
@@ -19,10 +20,15 @@ public class Categorie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false,unique = true,name = "code_categorie")
     private String codeCategorie;
     @Column(nullable = false,unique = true)
     private String libele;
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "categorie")
     private List <Produit> produit=new ArrayList<>();
+
+    public Categorie( String libele,String codeCategorie) {
+        this.codeCategorie = codeCategorie;
+        this.libele = libele;
+    }
 }
