@@ -19,5 +19,5 @@ public class Profil {
     private String description;
     private String avatar;
     @OneToOne(cascade = CascadeType.PERSIST,mappedBy = "profil")
-private Client client;
+private Utilisateur utilisateur;
 }

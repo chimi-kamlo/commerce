@@ -8,8 +8,6 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "roles")
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 public class Role {
@@ -18,4 +16,11 @@ public class Role {
     private int id;
     @Enumerated(EnumType.STRING)
     private TypeRole libele;
+
+    public Role() {
+    }
+
+    public Role(TypeRole libele) {
+        this.libele = libele;
+    }
 }

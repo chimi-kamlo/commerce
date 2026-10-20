@@ -1,22 +1,19 @@
 package com.ecommerce.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 @Entity
-@Table(name = "roles")
+@Table(name = "commandes")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Commande {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +30,6 @@ public class Commande {
     )
     private List<LigneCommande> ligneCommande = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id",referencedColumnName = "id",nullable = false)
-    private Client client;
-
-
+    @JoinColumn(name = "utilisateur_id",nullable = false,referencedColumnName = "id")
+    private Utilisateur utilisateur;
 }
