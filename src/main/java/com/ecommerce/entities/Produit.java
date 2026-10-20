@@ -1,10 +1,7 @@
 package com.ecommerce.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -15,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Builder
 @Setter
 public class Produit {
     @Id
@@ -37,5 +35,13 @@ public class Produit {
 
     )
     private List<LigneCommande> ligneCommande = new ArrayList<>();
+
+    public Produit(String nomProduit, BigDecimal prix, long stock, Categorie categorie) {
+        this.nomProduit = nomProduit;
+        this.prix = prix;
+        this.stock = stock;
+        this.categorie = categorie;
+    }
+
 
 }
