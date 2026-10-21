@@ -5,12 +5,16 @@ import com.ecommerce.dto.UtilisateurResponseDto;
 import com.ecommerce.entities.Role;
 import com.ecommerce.entities.TypeRole;
 import com.ecommerce.entities.Utilisateur;
-import com.ecommerce.mapper.GetAllCategorieDtoMapper;
 import com.ecommerce.mapper.GetAllUtilisateurDtoMapper;
 import com.ecommerce.mapper.UtilisateurDtoMapper;
+import com.ecommerce.repositories.RoleRpository;
 import com.ecommerce.repositories.UtilisateurRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,16 +22,19 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class UtilisateurService {
+public class UtilisateurService implements UserDetailsService {
     private final UtilisateurRepository utilisateurRepository;
     private final UtilisateurDtoMapper utilisateurDtoMapper;
   private final GetAllUtilisateurDtoMapper getAllUtilisateurDtoMapper;
-
-    public UtilisateurService(UtilisateurRepository utilisateurRepository, UtilisateurDtoMapper utilisateurDtoMapper, GetAllUtilisateurDtoMapper getAllUtilisateurDtoMapper) {
+  private final PasswordEncoder passwordEncoder;
+  private  final RoleRpository roleRpository;
+    public UtilisateurService(UtilisateurRepository utilisateurRepository, UtilisateurDtoMapper utilisateurDtoMapper, GetAllUtilisateurDtoMapper getAllUtilisateurDtoMapper, PasswordEncoder passwordEncoder, RoleRpository roleRpository) {
         this.utilisateurRepository = utilisateurRepository;
         this.utilisateurDtoMapper = utilisateurDtoMapper;
 
         this.getAllUtilisateurDtoMapper = getAllUtilisateurDtoMapper;
+        this.passwordEncoder = passwordEncoder;
+        this.roleRpository = roleRpository;
     }
 
     // ENREGISTREMENT D'UN UTILISATEUR EN BASE DE DONNEE
@@ -40,18 +47,30 @@ public class UtilisateurService {
       if(utilisateur.isPresent()){
           throw  new EntityNotFoundException("cette adresse Email Existe DEJA");
       }
+        // CONSTRUCTION DE MON UTILISATEUR AVANT SAUVEGARDE EN BD
+        String motDePasseEncode =   passwordEncoder.encode(utilisateurRequestDto.motDePasse());
+        Utilisateur utilisateurBd = new Utilisateur(utilisateurRequestDto.nom(),
+                utilisateurRequestDto.prenom(),
+                utilisateurRequestDto.email(),
+                motDePasseEncode);
+
 
         // JE DEFINIE LE ROLE DE MON UTILISATEUR
-     Role role = new Role(TypeRole.UTILISATEUR);
 
-     // CONSTRUCTION DE MON UTILISATEUR AVANT SAUVEGARDE EN BD
-       Utilisateur utilisateurBd = Utilisateur.builder()
-               .email(utilisateurRequestDto.email())
-               .motDePasse(utilisateurRequestDto.motDePasse())
-               .nom(utilisateurRequestDto.nom())
-               .prenom(utilisateurRequestDto.prenom())
-               .role(role)
-               .build();
+      Optional<Role> roleBd =this.roleRpository.findRoleByLibele(TypeRole.UTILISATEUR);
+
+        if(roleBd.isPresent()){
+            utilisateurBd.setRole(roleBd.get());
+
+        }
+         Role role = new Role();
+         log.info(roleBd.isPresent() + "");
+         role.setLibele(TypeRole.UTILISATEUR);
+         utilisateurBd.setRole(role);
+
+
+
+
        //SAUVEGARDE DE MON UTILISATEUR EN BD
          Utilisateur utilisateurSauvegarde=this.utilisateurRepository.save(utilisateurBd);
          return utilisateurDtoMapper.apply(utilisateurSauvegarde);
@@ -96,5 +115,12 @@ public class UtilisateurService {
                 ()->new EntityNotFoundException("cet utilisateur n'existe pas!")
         );
         this.utilisateurRepository.delete(utilisateurBd);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserDetails user= this.utilisateurRepository.findUtilisateurByEmail(username).orElseThrow(()->new UsernameNotFoundException("utilisateur introuvable"));
+
+        return user;
     }
 }

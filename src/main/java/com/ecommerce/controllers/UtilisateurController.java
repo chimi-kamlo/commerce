@@ -1,7 +1,9 @@
 package com.ecommerce.controllers;
 
+import com.ecommerce.dto.AuthenticationDto;
 import com.ecommerce.dto.UtilisateurRequestDto;
 import com.ecommerce.dto.UtilisateurResponseDto;
+import com.ecommerce.security.AuthenticationService;
 import com.ecommerce.services.UtilisateurService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -10,19 +12,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("utilisateurs")
 public class UtilisateurController {
     private  final UtilisateurService utilisateurService;
+    private final AuthenticationService authenticationSerice;
 
-    public UtilisateurController(UtilisateurService utilisateurService) {
+    public UtilisateurController(UtilisateurService utilisateurService, AuthenticationService authenticationSerice) {
         this.utilisateurService = utilisateurService;
+        this.authenticationSerice = authenticationSerice;
     }
 
     // ENREGISTREMENT D'UN UTILISATEUR EN BASE DE DONNEE
 
-    @PostMapping()
+    @PostMapping("inscription")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<UtilisateurResponseDto> createUtilisateur(@RequestBody @Valid UtilisateurRequestDto utilisateurRequestDto){
         UtilisateurResponseDto utilisateur = this.utilisateurService.createUtilisateur(utilisateurRequestDto);
@@ -66,5 +71,15 @@ public class UtilisateurController {
     public ResponseEntity<String> deleteUtilisateur(@PathVariable int utilisateur_id){
         this.utilisateurService.deleteUtilisateur(utilisateur_id);
         return ResponseEntity.ok("suppréssion reussie");
+    }
+
+
+    // AUTHENTIFICATION D'UN UTILISATEUR
+   @PostMapping("Authentication")
+   @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Map<String,String>>Authentification(@RequestBody AuthenticationDto authenticationDto){
+
+            Map<String,String> token= this.authenticationSerice.Authentification(authenticationDto);
+        return ResponseEntity.ok().body(token);
     }
 }
