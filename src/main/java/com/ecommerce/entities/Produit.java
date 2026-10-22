@@ -24,7 +24,7 @@ public class Produit {
     private BigDecimal prix;
     @Column(nullable = false)
     private  long stock;
-    @Column(nullable = false,name = "image_produit")
+    @Column(name = "image_produit")
     private String imageProduit;
     @ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "categorie_id",referencedColumnName = "id")

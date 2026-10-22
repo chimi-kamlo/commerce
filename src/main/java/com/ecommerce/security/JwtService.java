@@ -6,16 +6,16 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.xml.crypto.Data;
+import javax.crypto.SecretKey;
 import java.io.Serializable;
 import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
-
+@Slf4j
 @Service
 public class JwtService {
     @Value("${jwt.secret}")
@@ -28,7 +28,30 @@ public class JwtService {
 
     public Map<String, String> generateToken(String username) {
         Utilisateur utilisateur = (Utilisateur) this.utilisateurService.loadUserByUsername(username);
+
         return getJwt(utilisateur);
+    }
+    public boolean IsExpired(String jwt) {
+        Claims claims = getAllClaims(jwt);
+        Date expiration = claims.getExpiration();
+        return expiration.before(new Date());
+    }
+
+
+    public String extractUsername(String jwt) {
+        Claims claims = getAllClaims(jwt);
+
+        return claims.getSubject();
+    }
+
+    // EXTRACTION DES DONNEES DANS LE TOKEN
+    private Claims getAllClaims(String jwt) {
+        Claims claims = Jwts.parser()
+                .verifyWith((SecretKey) getKey())
+                .build()
+                .parseSignedClaims(jwt)
+                .getPayload();
+        return  claims;
     }
 
     private Map<String, String> getJwt(Utilisateur utilisateur) {
@@ -59,4 +82,6 @@ public class JwtService {
         byte[] decode = Decoders.BASE64.decode(ENTCRIPTIO_KEY);
         return Keys.hmacShaKeyFor(decode);
     }
+
+
 }
