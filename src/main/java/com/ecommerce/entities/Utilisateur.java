@@ -33,7 +33,6 @@ public class Utilisateur implements UserDetails {
     @Column(unique = true,nullable = false,name = "mot_de_passe")
     private String motDePasse;
     private boolean actif = true;
-
     public Utilisateur(String nom, String prenom, String email, String motDePasse) {
         this.nom = nom;
         this.prenom = prenom;
@@ -58,12 +57,12 @@ public class Utilisateur implements UserDetails {
 
     @Override
     public @Nullable String getPassword() {
-        return motDePasse;
+        return this.motDePasse;
     }
 
     @Override
     public String getUsername() {
-        return email;
+        return this.email;
     }
 
     @Override

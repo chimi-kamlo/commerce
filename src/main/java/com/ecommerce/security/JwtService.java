@@ -1,36 +1,67 @@
 package com.ecommerce.security;
 
+import com.ecommerce.entities.Jwt;
 import com.ecommerce.entities.Utilisateur;
+import com.ecommerce.repositories.JwtRepository;
+import com.ecommerce.repositories.UtilisateurRepository;
 import com.ecommerce.services.UtilisateurService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.io.Serializable;
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Slf4j
 @Service
+@Transactional
 public class JwtService {
     @Value("${jwt.secret}")
     private  String ENTCRIPTIO_KEY ;
  private  final UtilisateurService utilisateurService;
+ private final JwtRepository jwtRepository;
+ private final UtilisateurRepository utilisateurRepository;
 
-    public JwtService(UtilisateurService utilisateurService) {
+    public JwtService(UtilisateurService utilisateurService, JwtRepository jwtRepository, UtilisateurRepository utilisateurRepository) {
         this.utilisateurService = utilisateurService;
+        this.jwtRepository = jwtRepository;
+
+        this.utilisateurRepository = utilisateurRepository;
     }
 
     public Map<String, String> generateToken(String username) {
         Utilisateur utilisateur = (Utilisateur) this.utilisateurService.loadUserByUsername(username);
 
-        return getJwt(utilisateur);
+        Map<String, String> jwtMap = getJwt(utilisateur);
+      this.desactiveToken(utilisateur);
+        // STOCKAGE DU JWT EN BASE DE DONNEES
+        Jwt jwt = Jwt.builder()
+                .desactive(false)
+                .expire(false)
+                .valeur(jwtMap.get("Bearer"))
+                .utilisateur(utilisateur)
+                .build();
+
+    this.jwtRepository.save(jwt);
+
+        return jwtMap;
     }
+
+
+
     public boolean IsExpired(String jwt) {
         Claims claims = getAllClaims(jwt);
         Date expiration = claims.getExpiration();
@@ -42,6 +73,12 @@ public class JwtService {
         Claims claims = getAllClaims(jwt);
 
         return claims.getSubject();
+    }
+
+    // RECUPERATION DU TOKEN EN BASE DE DONNEES
+
+    public Jwt getBdToken(String token) {
+     return  this.jwtRepository.findByValeurAndDesactiveAndExpire(token, false, false).orElseThrow(()-> new RuntimeException("Token Invalide"));
     }
 
     // EXTRACTION DES DONNEES DANS LE TOKEN
@@ -83,5 +120,27 @@ public class JwtService {
         return Keys.hmacShaKeyFor(decode);
     }
 
+  // DESACTIVATION DES JwtToken
+    private void desactiveToken(Utilisateur utilisateur) {
+        List<Jwt> allJwt = this.jwtRepository.getAllUtilisateurToken(utilisateur.getEmail()).peek(
+                (user) -> {
 
+                    user.setDesactive(true);
+                    user.setExpire(true);
+                }
+        ).collect(Collectors.toList());
+        this.jwtRepository.saveAll(allJwt);
+
+    }
+
+
+    public void deconnexion() {
+        Utilisateur utilisateur =(Utilisateur) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Jwt jwt = this.jwtRepository.getAllUtilisateuValideToken(utilisateur.getEmail(),false,false).orElseThrow(
+                ()->new RuntimeException("Token Invalide"));
+   jwt.setExpire(true);
+        jwt.setDesactive(true);
+
+        this.jwtRepository.save(jwt);
+    }
 }

@@ -3,7 +3,9 @@ package com.ecommerce.controllers;
 import com.ecommerce.dto.AuthenticationDto;
 import com.ecommerce.dto.UtilisateurRequestDto;
 import com.ecommerce.dto.UtilisateurResponseDto;
+import com.ecommerce.repositories.JwtRepository;
 import com.ecommerce.security.AuthenticationService;
+import com.ecommerce.security.JwtService;
 import com.ecommerce.services.UtilisateurService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -19,10 +21,14 @@ import java.util.Map;
 public class UtilisateurController {
     private  final UtilisateurService utilisateurService;
     private final AuthenticationService authenticationSerice;
+    private final JwtService jwtService;
 
-    public UtilisateurController(UtilisateurService utilisateurService, AuthenticationService authenticationSerice) {
+
+    public UtilisateurController(UtilisateurService utilisateurService, AuthenticationService authenticationSerice, JwtService jwtService) {
         this.utilisateurService = utilisateurService;
         this.authenticationSerice = authenticationSerice;
+
+        this.jwtService = jwtService;
     }
 
     // ENREGISTREMENT D'UN UTILISATEUR EN BASE DE DONNEE
@@ -81,5 +87,14 @@ public class UtilisateurController {
 
             Map<String,String> token= this.authenticationSerice.Authentification(authenticationDto);
         return ResponseEntity.ok().body(token);
+    }
+
+    // deconnexion utilisateur
+
+    @PostMapping("deconnexion")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> deconnexion(){
+        this.jwtService.deconnexion();
+    return ResponseEntity.ok("deconnecté avec Succes");
     }
 }

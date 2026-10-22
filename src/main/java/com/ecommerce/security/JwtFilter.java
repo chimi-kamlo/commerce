@@ -1,5 +1,6 @@
 package com.ecommerce.security;
 
+import com.ecommerce.entities.Jwt;
 import com.ecommerce.entities.Utilisateur;
 import com.ecommerce.services.UtilisateurService;
 import jakarta.servlet.FilterChain;
@@ -26,8 +27,9 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String jwt = null;
-        boolean isExpire = false;
+        boolean isExpire = true;
         String username = null;
+        Jwt jwtBd;
         String authorization = request.getHeader("Authorization");
 
         if(authorization==null||!authorization.startsWith("Bearer")){
@@ -38,10 +40,11 @@ public class JwtFilter extends OncePerRequestFilter {
         isExpire = this.jwtService.IsExpired(jwt);
         username = this.jwtService.extractUsername(jwt);
 
-        if(!isExpire &&username!=null&& SecurityContextHolder.getContext().getAuthentication()==null){
-      Utilisateur utilisateur = (Utilisateur) this.utilisateurService.loadUserByUsername(username);
+        jwtBd = this.jwtService.getBdToken(jwt);
 
-      UsernamePasswordAuthenticationToken authenticate = new UsernamePasswordAuthenticationToken(utilisateur,null,utilisateur.getAuthorities());
+        if(!isExpire &&jwtBd.getUtilisateur().getUsername().equals(username)&& SecurityContextHolder.getContext().getAuthentication()==null) {
+            Utilisateur utilisateur = (Utilisateur) this.utilisateurService.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken authenticate = new UsernamePasswordAuthenticationToken(utilisateur, null, utilisateur.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authenticate);
         }
         filterChain.doFilter(request,response);
