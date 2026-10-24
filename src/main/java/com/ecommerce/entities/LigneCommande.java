@@ -21,11 +21,20 @@ public class LigneCommande {
     @Column(nullable = false)
     private int quantite;
     @Column(nullable = false)
-    private BigDecimal prixUnitaire;
+    private BigDecimal prixUnitaire = BigDecimal.ZERO;
+    @Column(nullable = false)
+    private BigDecimal montant=BigDecimal.ZERO;
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.PERSIST)
     @JoinColumn(name = "produit_id",referencedColumnName = "id",nullable = false)
     private Produit produit;
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.PERSIST)
     @JoinColumn(name = "commande_id",referencedColumnName = "id",nullable = false)
     private Commande commande;
+
+    public LigneCommande(int quantite, BigDecimal prixUnitaire, Produit produit, Commande commande) {
+        this.quantite = quantite;
+        this.prixUnitaire = prixUnitaire;
+        this.produit = produit;
+        this.commande = commande;
+    }
 }
