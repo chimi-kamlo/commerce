@@ -43,7 +43,7 @@ public class Utilisateur implements UserDetails {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "utilisateur")
     private List<Commande> commandes = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY,orphanRemoval = true,cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @OneToOne(fetch = FetchType.EAGER,orphanRemoval = true,cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     @JoinColumn(name = "profil_id",unique = true,referencedColumnName = "id")
     private Profil profil;
 

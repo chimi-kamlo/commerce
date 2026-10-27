@@ -18,6 +18,12 @@ public class Profil {
     private int id;
     private String description;
     private String avatar;
-    @OneToOne(cascade = CascadeType.PERSIST,mappedBy = "profil")
+    @OneToOne(mappedBy = "profil")
 private Utilisateur utilisateur;
+
+    public Profil(String description, String avatar, Utilisateur utilisateur) {
+        this.description = description;
+        this.avatar = avatar;
+        this.utilisateur = utilisateur;
+    }
 }

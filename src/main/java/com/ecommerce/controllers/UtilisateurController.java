@@ -1,18 +1,23 @@
 package com.ecommerce.controllers;
 
 import com.ecommerce.dto.AuthenticationDto;
+import com.ecommerce.dto.ProfilRequestDto;
 import com.ecommerce.dto.UtilisateurRequestDto;
 import com.ecommerce.dto.UtilisateurResponseDto;
-import com.ecommerce.repositories.JwtRepository;
 import com.ecommerce.security.AuthenticationService;
 import com.ecommerce.security.JwtService;
 import com.ecommerce.services.UtilisateurService;
 import jakarta.validation.Valid;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -97,4 +102,43 @@ public class UtilisateurController {
         this.jwtService.deconnexion();
     return ResponseEntity.ok("deconnecté avec Succes");
     }
+
+    // AJOUTER UN PROFIL A L'UTILISATEUR
+     @PatchMapping(path = "profil",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+     @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> addUtilisateurProfil(@RequestPart("image") MultipartFile image,
+                                                       @RequestPart("description") ProfilRequestDto description) throws IOException {
+        this.utilisateurService.addUtilisateurProfil(image,description);
+         return ResponseEntity.status(HttpStatus.ACCEPTED).body("succes");
+     }
+
+
+     //RECUPER LE PROFIL DE L'UTILISATEUR CONNECTE
+     @GetMapping("profil")
+     @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity< Map<String,String>> getProfilUtilisateur() throws IOException {
+
+         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(
+                 this.utilisateurService.getProfilUtilisateur()
+         );
+     }
+
+
+         // RECUPERER L'IMAGE D'UN UTILISATEUR
+         @ResponseStatus(HttpStatus.OK)
+         @GetMapping("/profil/image")
+         public ResponseEntity <Resource> getUtilisateurImage() throws IOException {
+
+             Resource resource = this.utilisateurService.getUtilisateurImage();
+             Path path= this.utilisateurService.getUtilisateurImagePath();
+             String type = Files.probeContentType(path);
+             MediaType mediaType = type != null
+                     ? MediaType.parseMediaType(type)
+                     : MediaType.APPLICATION_OCTET_STREAM;
+
+             return ResponseEntity.status(HttpStatus.ACCEPTED)
+                     .contentType(mediaType)
+                     .body(resource);
+
+}
 }

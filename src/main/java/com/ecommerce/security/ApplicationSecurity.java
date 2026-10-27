@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
 @EnableWebSecurity
@@ -32,13 +33,20 @@ private  final JwtFilter jwtFilter;
 
     @Bean
 
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
+                                                   HandlerExceptionResolver handlerExceptionResolver){
 
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(exception->
+                        exception.authenticationEntryPoint((request, response, authException)->{
+                            handlerExceptionResolver.resolveException(request,response,null,authException);
+                        })
+                        )
                 .authorizeHttpRequests(htt->
                         htt.requestMatchers(HttpMethod.POST,"/utilisateurs/inscription").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/utilisateurs/Authentication").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
                                 .anyRequest().authenticated()
                 )
 

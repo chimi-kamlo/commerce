@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 @Slf4j
@@ -19,9 +20,12 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
    private final UtilisateurService utilisateurService;
-    public JwtFilter(JwtService jwtService, UtilisateurService utilisateurService) {
+   private final HandlerExceptionResolver handlerExceptionResolver;
+    public JwtFilter(JwtService jwtService, UtilisateurService utilisateurService, HandlerExceptionResolver handlerExceptionResolver) {
         this.jwtService = jwtService;
         this.utilisateurService = utilisateurService;
+
+        this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
     @Override
@@ -32,10 +36,13 @@ public class JwtFilter extends OncePerRequestFilter {
         Jwt jwtBd;
         String authorization = request.getHeader("Authorization");
 
-        if(authorization==null||!authorization.startsWith("Bearer")){
+        if(authorization==null||!authorization.startsWith("Bearer ")){
             filterChain.doFilter(request,response);
             return;
         }
+        try {
+
+
          jwt = authorization.substring(7);
         isExpire = this.jwtService.IsExpired(jwt);
         username = this.jwtService.extractUsername(jwt);
@@ -48,6 +55,10 @@ public class JwtFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authenticate);
         }
         filterChain.doFilter(request,response);
+    } catch (Exception exception) {
+           handlerExceptionResolver.resolveException(request,response,null,exception);
+        }
     }
+
 }
 
