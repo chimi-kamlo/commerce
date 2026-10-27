@@ -13,6 +13,8 @@ import com.ecommerce.repositories.ProduitRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -103,19 +105,19 @@ public class CommandeService {
     }
 
     // RECUPERER TOUTES LES COMMANDES
-    public List<CommandResponseDto> getAllCommandes(){
-      List  <Commande> commande = this.commandeRepository.findAll();
+    public List<CommandResponseDto> getAllCommandes(Pageable pageable){
+      Page <Commande> commande =  this.commandeRepository.findAll(pageable);
 
         return this.getAllCommandeDtoMapper.apply(commande);
     }
 
     // RECUPERER TOUTES LES COMMANDES D'UN UTILISATEUR SPECIFIQUE
 
-    public List<CommandResponseDto> getAllCommandesSpesifiqueUtilisateur(){
+    public List<CommandResponseDto> getAllCommandesSpesifiqueUtilisateur(Pageable pageable){
         // JE RECUPER MON UTILISATEUR DANS LE CONTEXTE DE SECURITE
         Utilisateur utilisateur = (Utilisateur) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        List  <Commande> commande = this.commandeRepository.findAllByUtilisateurId(utilisateur.getId());
+        Page <Commande> commande = this.commandeRepository.findAllByUtilisateurId(utilisateur.getId(),pageable);
 
         return this.getAllCommandeDtoMapper.apply(commande);
     }

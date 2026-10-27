@@ -33,12 +33,7 @@ public class Utilisateur implements UserDetails {
     @Column(unique = true,nullable = false,name = "mot_de_passe")
     private String motDePasse;
     private boolean actif = true;
-    public Utilisateur(String nom, String prenom, String email, String motDePasse) {
-        this.nom = nom;
-        this.prenom = prenom;
-        this.email = email;
-        this.motDePasse = motDePasse;
-    }
+
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "utilisateur")
     private List<Commande> commandes = new ArrayList<>();
@@ -49,6 +44,15 @@ public class Utilisateur implements UserDetails {
 
     @OneToOne(cascade = CascadeType.PERSIST)
     private Role role;
+    @OneToMany(mappedBy = "utilisateur",orphanRemoval = true,cascade = CascadeType.REMOVE)
+    private List<Jwt> jwt = new ArrayList<>();
+
+    public Utilisateur(String nom, String prenom, String email, String motDePasse) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.email = email;
+        this.motDePasse = motDePasse;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

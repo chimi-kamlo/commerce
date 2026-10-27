@@ -16,6 +16,7 @@ public class Jwt {
     private int id;
     private  Boolean expire;
     private Boolean desactive;
+    @Column(length = 2048)
     private String valeur;
     @ManyToOne( cascade ={ CascadeType.DETACH,CascadeType.MERGE} )
     @JoinColumn(name = "utilisateur_id",referencedColumnName = "id")

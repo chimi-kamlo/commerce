@@ -1,4 +1,7 @@
 package com.ecommerce.dto;
 
-public record ProfilRequestDto(String description) {
+public record ProfilRequestDto(
+
+        String description
+) {
 }

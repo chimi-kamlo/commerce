@@ -2,13 +2,14 @@ package com.ecommerce.mapper;
 
 import com.ecommerce.dto.CommandResponseDto;
 import com.ecommerce.entities.Commande;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 @Component
-public class GetAllCommandeDtoMapper implements Function<List<Commande>,List<CommandResponseDto>> {
+public class GetAllCommandeDtoMapper implements Function<Page<Commande>,List<CommandResponseDto>> {
    private  final  CommandeDtoMapper commandeDtoMapper;
 
     public GetAllCommandeDtoMapper(CommandeDtoMapper commandeDtoMapper) {
@@ -16,7 +17,7 @@ public class GetAllCommandeDtoMapper implements Function<List<Commande>,List<Com
     }
 
     @Override
-    public List<CommandResponseDto> apply(List<Commande> commandes) {
+    public List<CommandResponseDto> apply(Page<Commande> commandes) {
         List<CommandResponseDto> commandResponseDtos=new ArrayList<>();
         for (Commande commande:commandes){
             // INITIALISATION DES CommandResponseDto A TRAVERS LA commandeDtoMapper FUNCTION

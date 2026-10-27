@@ -4,6 +4,7 @@ import com.ecommerce.dto.ProduitRequestDto;
 import com.ecommerce.dto.ProduitResponseDto;
 import com.ecommerce.entities.Categorie;
 import com.ecommerce.entities.Produit;
+import com.ecommerce.errors.RessourceIntrouvableException;
 import com.ecommerce.mapper.GetAllProduitDtoMapper;
 import com.ecommerce.mapper.ProduitDtoMapper;
 import com.ecommerce.repositories.CategorieRepository;
@@ -105,7 +106,7 @@ public class ProduitService {
             throw new IllegalArgumentException("La taille du fichier ne doit pas dépasser 2 Mo");
         }
       if(fichier.isEmpty()){
-          throw new IllegalArgumentException("le fichier est vide");
+          throw new RessourceIntrouvableException("le fichier est vide");
       }
         Path dossier = Paths.get("uploads")
                         .toAbsolutePath()

@@ -1,4 +1,11 @@
 package com.ecommerce.dto;
 
-public record AuthenticationDto(String username,String password) {
+import jakarta.validation.constraints.NotBlank;
+
+public record AuthenticationDto(
+        @NotBlank(message = "L'Email  est obligatoire")
+        String username,
+        @NotBlank(message = "Le mot de passe  est obligatoire")
+        String password
+) {
 }

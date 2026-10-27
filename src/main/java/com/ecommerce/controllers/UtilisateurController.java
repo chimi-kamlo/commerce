@@ -1,13 +1,12 @@
 package com.ecommerce.controllers;
 
-import com.ecommerce.dto.AuthenticationDto;
-import com.ecommerce.dto.ProfilRequestDto;
-import com.ecommerce.dto.UtilisateurRequestDto;
-import com.ecommerce.dto.UtilisateurResponseDto;
+import com.ecommerce.dto.*;
 import com.ecommerce.security.AuthenticationService;
 import com.ecommerce.security.JwtService;
 import com.ecommerce.services.UtilisateurService;
+import com.ecommerce.utils.ApiResponseRefactor;
 import jakarta.validation.Valid;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,99 +26,159 @@ public class UtilisateurController {
     private  final UtilisateurService utilisateurService;
     private final AuthenticationService authenticationSerice;
     private final JwtService jwtService;
+    private final ApiResponseRefactor apiResponseRefactor;
 
 
-    public UtilisateurController(UtilisateurService utilisateurService, AuthenticationService authenticationSerice, JwtService jwtService) {
+    public UtilisateurController(UtilisateurService utilisateurService, AuthenticationService authenticationSerice, JwtService jwtService, ApiResponseRefactor apiResponseRefactor) {
         this.utilisateurService = utilisateurService;
         this.authenticationSerice = authenticationSerice;
 
         this.jwtService = jwtService;
+        this.apiResponseRefactor = apiResponseRefactor;
     }
 
     // ENREGISTREMENT D'UN UTILISATEUR EN BASE DE DONNEE
 
     @PostMapping("inscription")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<UtilisateurResponseDto> createUtilisateur(@RequestBody @Valid UtilisateurRequestDto utilisateurRequestDto){
+    public ResponseEntity<ApiResponse<UtilisateurResponseDto>> createUtilisateur(@RequestBody @Valid UtilisateurRequestDto utilisateurRequestDto){
         UtilisateurResponseDto utilisateur = this.utilisateurService.createUtilisateur(utilisateurRequestDto);
 
+        ApiResponse<UtilisateurResponseDto> response= this.apiResponseRefactor.response(
+                utilisateur,
+                "Enregistrement  Reussi",
+                null,
+                true
+        );
         return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(utilisateur);
+                .body(response);
 
     }
 
     // RECUPERATION DE TOUS LES UTILISATEURS
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<UtilisateurResponseDto>> getAllUtilisateur(){
+    public ResponseEntity<ApiResponse<List<UtilisateurResponseDto>>> getAllUtilisateur(){
         List<UtilisateurResponseDto> utilisateurs= this.utilisateurService.getAllUtilisateur();
+//        ApiResponse<List<UtilisateurResponseDto>> response = ResponseRefactor(
+//                utilisateurs,
+//                "Récupération réussie.");
 
+        ApiResponse<List<UtilisateurResponseDto>> response= this.apiResponseRefactor.response(
+                utilisateurs,
+                "Récupération réussie.",
+                null,
+                true
+        );
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(utilisateurs);
+                .body(response);
     }
+
+
 
     //RECUPERATION D'UN UTILISATEUR
    @GetMapping(path = "/{utilisateur_id}")
    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity <UtilisateurResponseDto> getUtilisateur(@PathVariable int utilisateur_id){
+    public ResponseEntity <ApiResponse<UtilisateurResponseDto>> getUtilisateur(@PathVariable int utilisateur_id){
        UtilisateurResponseDto utilisateurResponseDto = this.utilisateurService.getUtilisateur(utilisateur_id);
-
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(utilisateurResponseDto);
+       ApiResponse<UtilisateurResponseDto> response= this.apiResponseRefactor.response(
+               utilisateurResponseDto,
+               "Récupération réussie.",
+               null,
+               true
+       );
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
     // MISE A JOUR D'UN UTILISATEUR
     @PutMapping("/{utilisateur_id}")
-    public ResponseEntity<UtilisateurResponseDto> updateUtilisateur(@PathVariable int utilisateur_id, @RequestBody @Valid UtilisateurRequestDto utilisateurDto){
+    public ResponseEntity<ApiResponse<UtilisateurResponseDto>> updateUtilisateur(@PathVariable int utilisateur_id, @RequestBody @Valid UtilisateurRequestDto utilisateurDto){
  UtilisateurResponseDto utilisateurResponseDto = this.utilisateurService.updateUtilisateur(utilisateur_id,utilisateurDto);
-   return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(utilisateurResponseDto);
+        ApiResponse<UtilisateurResponseDto> response= this.apiResponseRefactor.response(
+                utilisateurResponseDto,
+                "Mise a jour  réussie.",
+                null,
+                true
+        );
+ return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
     //SUPPRIMER UN UTILISATEUR
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{utilisateur_id}")
-    public ResponseEntity<String> deleteUtilisateur(@PathVariable int utilisateur_id){
+    public ResponseEntity<ApiResponse<String>> deleteUtilisateur(@PathVariable int utilisateur_id){
         this.utilisateurService.deleteUtilisateur(utilisateur_id);
-        return ResponseEntity.ok("suppréssion reussie");
+        ApiResponse<String> response= this.apiResponseRefactor.response(
+                null,
+                "suppréssion reussie",
+                null,
+                true
+        );
+        return ResponseEntity.ok(response);
     }
 
 
     // AUTHENTIFICATION D'UN UTILISATEUR
    @PostMapping("Authentication")
    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Map<String,String>>Authentification(@RequestBody AuthenticationDto authenticationDto){
+    public ResponseEntity<ApiResponse<Map<String,String>>>Authentification(@RequestBody AuthenticationDto authenticationDto){
 
             Map<String,String> token= this.authenticationSerice.Authentification(authenticationDto);
-        return ResponseEntity.ok().body(token);
+       ApiResponse<Map<String,String>> response= this.apiResponseRefactor.response(
+               token,
+               "Authentification  réussie.",
+               null,
+               true
+       );
+            return ResponseEntity.ok().body(response);
     }
 
     // deconnexion utilisateur
 
     @PostMapping("deconnexion")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> deconnexion(){
+    public ResponseEntity<ApiResponse<String>> deconnexion(){
         this.jwtService.deconnexion();
-    return ResponseEntity.ok("deconnecté avec Succes");
+        ApiResponse<String> response= this.apiResponseRefactor.response(
+                null,
+                "deconnecté avec Succes",
+                null,
+                true
+        );
+    return ResponseEntity.ok().body(response);
     }
 
     // AJOUTER UN PROFIL A L'UTILISATEUR
      @PatchMapping(path = "profil",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
      @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> addUtilisateurProfil(@RequestPart("image") MultipartFile image,
+    public ResponseEntity<ApiResponse<String>> addUtilisateurProfil(@RequestPart("image") MultipartFile image,
                                                        @RequestPart("description") ProfilRequestDto description) throws IOException {
         this.utilisateurService.addUtilisateurProfil(image,description);
-         return ResponseEntity.status(HttpStatus.ACCEPTED).body("succes");
+         ApiResponse<String> response= this.apiResponseRefactor.response(
+                 null,
+                 "profil ajouté avec succes",
+                 null,
+                 true
+         );
+         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
      }
 
 
      //RECUPER LE PROFIL DE L'UTILISATEUR CONNECTE
      @GetMapping("profil")
      @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity< Map<String,String>> getProfilUtilisateur() throws IOException {
-
+    public ResponseEntity<ApiResponse< Map<String,String>>> getProfilUtilisateur() throws IOException {
+         Map<String,String> profil =  this.utilisateurService.getProfilUtilisateur();
+         ApiResponse<Map<String,String>> response= this.apiResponseRefactor.response(
+                 profil,
+                 "profil ajouté avec succes",
+                 null,
+                 true
+         );
          return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(
-                 this.utilisateurService.getProfilUtilisateur()
+                response
          );
      }
 
@@ -141,4 +200,6 @@ public class UtilisateurController {
                      .body(resource);
 
 }
+
+
 }
