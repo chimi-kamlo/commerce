@@ -46,7 +46,11 @@ private  final JwtFilter jwtFilter;
                 .authorizeHttpRequests(htt->
                         htt.requestMatchers(HttpMethod.POST,"/utilisateurs/inscription").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/utilisateurs/Authentication").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
+                                .requestMatchers(
+                                        "/v3/api-docs/**",
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html"
+                                ).permitAll()
                                 .anyRequest().authenticated()
                 )
 

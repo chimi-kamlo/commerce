@@ -1,10 +1,14 @@
 package com.ecommerce.controllers.advice;
 
-import com.ecommerce.dto.ApiResponse;
+import com.ecommerce.dto.ApiResponseDto;
 import com.ecommerce.errors.RessourceIntrouvableException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +32,7 @@ public class ApplicationException {
 
     // VALIDATION DES DONNEES
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Void>> gererErreursValidation(
+    public ResponseEntity<ApiResponseDto<Void>> gererErreursValidation(
             MethodArgumentNotValidException ex) {
 
         Map<String, String> erreurs = new LinkedHashMap<>();
@@ -40,7 +44,7 @@ public class ApplicationException {
                 )
         );
 
-        ApiResponse<Void> response = new ApiResponse<>(
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 "Les données envoyées sont invalides",
                 null,
@@ -52,11 +56,12 @@ public class ApplicationException {
 
     // GERE LES ARGUMENTS INATTENDUS
 
+
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResponse<Void>> gererArgumentInvalide(
+    public ResponseEntity<ApiResponseDto<Void>> gererArgumentInvalide(
             IllegalArgumentException ex) {
 
-        ApiResponse<Void> response = new ApiResponse<>(
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 ex.getMessage(),
                 null,
@@ -71,10 +76,10 @@ public class ApplicationException {
     // GERE LES ELEMENT INTROUVABLE
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> gererEntiteIntrouvable(
+    public ResponseEntity<ApiResponseDto<Void>> gererEntiteIntrouvable(
             EntityNotFoundException ex) {
 
-        ApiResponse<Void> response = new ApiResponse<>(
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 ex.getMessage(),
                 null,
@@ -89,8 +94,8 @@ public class ApplicationException {
     // ressource introuvable
 
     @ExceptionHandler(RessourceIntrouvableException.class)
-    public ResponseEntity<ApiResponse<Void>> gererRessourceIntrouvable(RessourceIntrouvableException ex){
-        ApiResponse<Void> response = new ApiResponse<>(
+    public ResponseEntity<ApiResponseDto<Void>> gererRessourceIntrouvable(RessourceIntrouvableException ex){
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 ex.getMessage(),
                 null,
@@ -102,10 +107,12 @@ public class ApplicationException {
     }
 
     // TAILLE DU FICHIER SUPPERIEUR A LA DEMANDE
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<ApiResponse<Void>> gererMaxUploadSize(MaxUploadSizeExceededException ex){
 
-        ApiResponse<Void> response = new ApiResponse<>(
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponseDto<Void>> gererMaxUploadSize(MaxUploadSizeExceededException ex){
+
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 ex.getMessage(),
                 null,
@@ -117,9 +124,10 @@ public class ApplicationException {
     }
 
      //JSON MAL FORME
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiResponse<Void>> gererHttpMessageNotReadable(HttpMessageNotReadableException ex){
-        ApiResponse<Void> response = new ApiResponse<>(
+    public ResponseEntity<ApiResponseDto<Void>> gererHttpMessageNotReadable(HttpMessageNotReadableException ex){
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 ex.getMessage(),
                 null,
@@ -132,9 +140,10 @@ public class ApplicationException {
     }
 
     // ACCES REFUSE
+
     @ExceptionHandler(AccessDeniedException.class)
-    ResponseEntity<ApiResponse<Void>>gererAccessDenied(AccessDeniedException ex){
-        ApiResponse<Void> response = new ApiResponse<>(
+    ResponseEntity<ApiResponseDto<Void>>gererAccessDenied(AccessDeniedException ex){
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 "Vous n'avez pas les autorisations nécessaires",
                 null,
@@ -148,15 +157,15 @@ public class ApplicationException {
 
     // INFORMATION INCORECTS
     @ExceptionHandler(BadCredentialsException.class)
-    ResponseEntity<ApiResponse<Void>>gererAccessDenied(BadCredentialsException ex){
-        ApiResponse<Void> response = new ApiResponse<>(
+    ResponseEntity<ApiResponseDto<Void>>gererAccessDenied(BadCredentialsException ex){
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 "Identifiants incorrects",
                 null,
                 null
         );
         return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(response);
 
     }
@@ -164,8 +173,8 @@ public class ApplicationException {
     // COMPTE NON ACTIVE
 
     @ExceptionHandler(DisabledException.class)
-    ResponseEntity<ApiResponse<Void>>gererAccessDenied(DisabledException ex){
-        ApiResponse<Void> response = new ApiResponse<>(
+    ResponseEntity<ApiResponseDto<Void>>gererAccessDenied(DisabledException ex){
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 "Compte désactivé",
                 null,
@@ -179,8 +188,8 @@ public class ApplicationException {
 
     //JWT EXPIRE
     @ExceptionHandler(ExpiredJwtException.class)
-    ResponseEntity<ApiResponse<Void>>gererExpiredJwt(ExpiredJwtException ex) {
-        ApiResponse<Void> response = new ApiResponse<>(
+    ResponseEntity<ApiResponseDto<Void>>gererExpiredJwt(ExpiredJwtException ex) {
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 "Le token a expiré",
                 null,
@@ -194,8 +203,8 @@ public class ApplicationException {
 
     //SIGNATURE DU JWT
     @ExceptionHandler(SignatureException.class)
-    ResponseEntity<ApiResponse<Void>>gererSignature(SignatureException ex) {
-        ApiResponse<Void> response = new ApiResponse<>(
+    ResponseEntity<ApiResponseDto<Void>>gererSignature(SignatureException ex) {
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 "La signature de votre token est incorect",
                 null,
@@ -208,8 +217,8 @@ public class ApplicationException {
     }
 // JWT MAL FORME
     @ExceptionHandler(MalformedJwtException.class)
-    ResponseEntity<ApiResponse<Void>>gererMalformedJwt(MalformedJwtException ex) {
-        ApiResponse<Void> response = new ApiResponse<>(
+    ResponseEntity<ApiResponseDto<Void>>gererMalformedJwt(MalformedJwtException ex) {
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 "Token mal formé",
                 null,
@@ -224,10 +233,10 @@ public class ApplicationException {
 // ERREUR D'AUTHENTIFICATION
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ApiResponse<Void>> gererAuthentification(
+    public ResponseEntity<ApiResponseDto<Void>> gererAuthentification(
             AuthenticationException ex) {
 
-        ApiResponse<Void> response = new ApiResponse<>(
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 "Authentification requise ou invalide",
                 null,
@@ -254,10 +263,10 @@ public class ApplicationException {
 // EXCEPTION GLOBALE
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> gererExceptionGenerale(
+    public ResponseEntity<ApiResponseDto<Void>> gererExceptionGenerale(
             Exception ex) {
 
-        ApiResponse<Void> response = new ApiResponse<>(
+        ApiResponseDto<Void> response = new ApiResponseDto<>(
                 false,
                 "Une erreur interne est survenue",
                 null,

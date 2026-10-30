@@ -2,7 +2,7 @@ package com.ecommerce.dto;
 
 import java.util.Map;
 
-public record ApiResponse<T>(
+public record ApiResponseDto<T>(
         boolean success,
         String message,
         T data,

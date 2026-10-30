@@ -1,15 +1,15 @@
 package com.ecommerce.utils;
 
-import com.ecommerce.dto.ApiResponse;
+import com.ecommerce.dto.ApiResponseDto;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Component
 public class ApiResponseRefactor  {
-    public <T> ApiResponse<T> response(T data,String message,Map<String,String> error,boolean valide){
+    public <T> ApiResponseDto<T> response(T data, String message, Map<String,String> error, boolean valide){
 
-        return new ApiResponse<>(valide,message,data,error);
+        return new ApiResponseDto<>(valide,message,data,error);
 
     }
 }
