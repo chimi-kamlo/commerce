@@ -40,7 +40,7 @@ API REST développée avec Java et Spring Boot permettant de gérer une platefor
 -> Git / GitHub
 
 ### Architecture du projet
-![swagger.PNG](images/swagger.PNG)
+![swagger.PNG](docs/swagger.PNG)
 
 ### Prérequis
 
@@ -97,7 +97,7 @@ puis introduiser les variables suivantes avec les valeurs correctes :
 
  La documentation interactive des endpoints est disponible avec Swagger UI :
 
-![swagger.PNG](images/swagger.PNG)
+![swagger.PNG](docs/swagger.PNG)
 
 ### Auteur
 
