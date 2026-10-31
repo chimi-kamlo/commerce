@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -103,6 +104,7 @@ public class CommandeController {
             )
 
     })
+    @PreAuthorize("hasAuthority('PASSER_COMMANDE')")
     @PostMapping("passerCommande")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponseDto<CommandResponseDto>> passerCommande(
@@ -176,7 +178,7 @@ public class CommandeController {
             )
 
     })
-
+    @PreAuthorize("hasAuthority('COMMANDE_READ')")
     @GetMapping("/{commande_id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponseDto<CommandResponseDto>> getCommande(
@@ -239,7 +241,7 @@ public class CommandeController {
 
 
     })
-
+    @PreAuthorize("hasAuthority('COMMANDE_READ')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
    public ResponseEntity<ApiResponseDto<List<CommandResponseDto>>> getAllCommandes(
@@ -326,6 +328,7 @@ public class CommandeController {
 
 
     })
+    @PreAuthorize("hasAuthority('COMMANDE_UTILISATEUR_READ')")
     @GetMapping("commandeUtilisateur")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponseDto<List<CommandResponseDto>>> getAllCommandesSpesifiqueUtilisateur(
@@ -372,6 +375,7 @@ public class CommandeController {
     }
 
     // MODIFIER LE STATUT D'UNE COMMANDE
+    @PreAuthorize("hasAuthority('COMMANDE_UPDATE')")
    @PatchMapping("statut")
    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponseDto<CommandResponseDto>> updateCommandeStatut(
@@ -443,6 +447,7 @@ public class CommandeController {
             )
 
     })
+    @PreAuthorize("hasAuthority('COMMANDE_UPDATE')")
     @PatchMapping("/{commande_reference}/ligne/{ligneCommande_id}")
     @ResponseStatus(HttpStatus.OK)
     public  ResponseEntity<ApiResponseDto<CommandResponseDto>> updateLigneCommande(

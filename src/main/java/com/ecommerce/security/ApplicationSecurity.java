@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,16 +20,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
+@EnableMethodSecurity
 @EnableWebSecurity
 public class ApplicationSecurity {
 private final UserDetailsService userDetailsService;
 private  final BCryptPasswordEncoder bCryptPasswordEncoder;
 private  final JwtFilter jwtFilter;
+private final CustomAccessDeniedHandler accessDeniedHandler;
 
-    public ApplicationSecurity(UserDetailsService userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtFilter jwtFilter) {
+    public ApplicationSecurity(UserDetailsService userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtFilter jwtFilter, CustomAccessDeniedHandler accessDeniedHandler) {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtFilter = jwtFilter;
+        this.accessDeniedHandler = accessDeniedHandler;
     }
 
     @Bean
@@ -38,19 +42,51 @@ private  final JwtFilter jwtFilter;
 
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception->
-                        exception.authenticationEntryPoint((request, response, authException)->{
-                            handlerExceptionResolver.resolveException(request,response,null,authException);
-                        })
-                        )
+                .exceptionHandling(exception -> exception
+                .accessDeniedHandler(accessDeniedHandler)
+        )
                 .authorizeHttpRequests(htt->
                         htt.requestMatchers(HttpMethod.POST,"/utilisateurs/inscription").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/utilisateurs/Authentication").permitAll()
+
                                 .requestMatchers(
                                         "/v3/api-docs/**",
                                         "/swagger-ui/**",
                                         "/swagger-ui.html"
                                 ).permitAll()
+                                // Gestion des produits
+                                .requestMatchers(HttpMethod.POST, "/produits/**")
+                                .hasAuthority("PRODUIT_CREATE")
+
+                                .requestMatchers(HttpMethod.GET, "/produits/**")
+                                .hasAuthority("PRODUIT_READ")
+
+                                .requestMatchers(HttpMethod.PUT, "/produits/**")
+                                .hasAuthority("PRODUIT_UPDATE")
+
+                                .requestMatchers(HttpMethod.DELETE, "/produits/**")
+                                .hasAuthority("PRODUIT_DELETE")
+                                //Gestion des commandes
+                                .requestMatchers(HttpMethod.POST, "/commandes/**")
+                                .hasAuthority("PASSER_COMMANDE")
+
+                                .requestMatchers(HttpMethod.GET, "/commandes/**")
+                                .hasAuthority("COMMANDE_READ")
+
+                                .requestMatchers(HttpMethod.PATCH, "/commandes/**")
+                                .hasAuthority("COMMANDE_UPDATE")
+                                //Gestion des commandes
+                                .requestMatchers(HttpMethod.POST, "/categories/**")
+                                .hasAuthority("CATEGORIE_CREATE")
+
+                                .requestMatchers(HttpMethod.GET, "/categories/**")
+                                .hasAuthority(" CATEGORIE_READ")
+                                //Gestion des commandes
+                                .requestMatchers(HttpMethod.GET, "/utilisateurs/**")
+                                .hasAuthority(" UTILISATEUR_READ")
+
+                                .requestMatchers(HttpMethod.DELETE, "/utilisateurs/**")
+                                .hasAuthority("UTILISATEUR_DELETE")
                                 .anyRequest().authenticated()
                 )
 

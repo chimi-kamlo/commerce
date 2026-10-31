@@ -5,18 +5,15 @@ import com.ecommerce.errors.RessourceIntrouvableException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -170,7 +167,7 @@ public class ApplicationException {
 
     }
 
-    // COMPTE NON ACTIVE
+    // COMPTE NON-ACTIVE
 
     @ExceptionHandler(DisabledException.class)
     ResponseEntity<ApiResponseDto<Void>>gererAccessDenied(DisabledException ex){
@@ -181,7 +178,7 @@ public class ApplicationException {
                 null
         );
         return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(response);
 
     }
@@ -232,21 +229,21 @@ public class ApplicationException {
 
 // ERREUR D'AUTHENTIFICATION
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ApiResponseDto<Void>> gererAuthentification(
-            AuthenticationException ex) {
+//    @ExceptionHandler(AuthenticationException.class)
+//    public ResponseEntity<ApiResponseDto<Void>> gererAuthentification(
+//            AuthenticationException ex) {
+//
+//        ApiResponseDto<Void> response = new ApiResponseDto<>(
+//                false,
+//                "Authentification requise ou invalide",
+//                null,
+//                null
+//        );
 
-        ApiResponseDto<Void> response = new ApiResponseDto<>(
-                false,
-                "Authentification requise ou invalide",
-                null,
-                null
-        );
-
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(response);
-    }
+//        return ResponseEntity
+//                .status(HttpStatus.UNAUTHORIZED)
+//                .body(response);
+//    }
 
 
 

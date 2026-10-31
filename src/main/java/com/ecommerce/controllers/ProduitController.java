@@ -20,6 +20,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,7 +42,7 @@ public class ProduitController {
         this.apiResponseRefactor = apiResponseRefactor;
     }
 
-    //CREATION D'UN PRODUIT
+    //ENREGISTREMENT D'UN PRODUIT
     @Operation(
             summary = "enregistrer un produit",
             description = "Permet d'enregistrer un nouveau produit ."
@@ -115,7 +116,7 @@ public class ProduitController {
                              }
             """))),
     })
-
+    @PreAuthorize("hasAuthority('PRODUIT_CREATE')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<ApiResponseDto<ProduitResponseDto>> createroduit(
@@ -180,6 +181,7 @@ public class ProduitController {
 
 
     })
+    @PreAuthorize("hasAuthority('PRODUIT_READ')")
      @GetMapping
      @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<ApiResponseDto<List<ProduitResponseDto>>>getAllProduit(){
@@ -249,6 +251,7 @@ public class ProduitController {
             """))),
 
     })
+    @PreAuthorize("hasAuthority('PRODUIT_READ')")
     @ResponseStatus(HttpStatus.ACCEPTED)
    @GetMapping(path = "/{id}")
     public ResponseEntity<ApiResponseDto<ProduitResponseDto>> getProduit(
@@ -323,6 +326,7 @@ public class ProduitController {
             ),
 
     })
+    @PreAuthorize("hasAuthority('PRODUIT_UPDATE')")
     @PutMapping( path = "/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<ApiResponseDto<ProduitResponseDto>> updateProduit(
@@ -406,6 +410,7 @@ response
             """))),
 
     })
+    @PreAuthorize("hasAuthority('PRODUIT_DELETE')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/{id}")
     public void delecteProduit(
@@ -473,7 +478,7 @@ response
             """))),
 
     })
-
+    @PreAuthorize("hasAuthority('PRODUIT_UPDATE')")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PostMapping(path= "/{produit_id}/image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity <ApiResponseDto<String>> addFile(@PathVariable int produit_id , @RequestParam("fichier") MultipartFile fichier) throws IOException {
@@ -488,7 +493,7 @@ response
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
-    // RECUPERER L'IMAGE D'UN PRODUIT
+    // VISUALISER L'IMAGE D'UN PRODUIT
     @Operation( description = "Permet de récuperé l'image d'un produit  ",
             summary = "récuper l'image d'un produit"
     )
@@ -528,6 +533,7 @@ response
                                          """))),
     })
    @ResponseStatus(HttpStatus.ACCEPTED)
+    @PreAuthorize("hasAuthority('PRODUIT_READ')")
    @GetMapping("/{produit_id}/image")
     public ResponseEntity <Resource> getProduitImage(@PathVariable int produit_id) throws IOException {
       Resource resource =this.produitService.getProduitImage(produit_id);

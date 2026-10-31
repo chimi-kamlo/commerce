@@ -19,6 +19,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -141,6 +142,7 @@ public class UtilisateurController {
 
 
     })
+    @PreAuthorize("hasAuthority('UTILISATEUR_READ')")
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -162,6 +164,7 @@ public class UtilisateurController {
 
 
     //RECUPERATION D'UN UTILISATEUR
+
     @Operation( description = "Permet la récupération les informations d'un utilisateur  à partir de son identifiant  ",
             summary = "récupéré un utilisateur par son identifiant"
     )
@@ -216,6 +219,7 @@ public class UtilisateurController {
 
     })
     @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAuthority('UTILISATEUR_READ')")
    @GetMapping(path = "/{utilisateur_id}")
    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity <ApiResponseDto<UtilisateurResponseDto>> getUtilisateur(
@@ -290,6 +294,7 @@ public class UtilisateurController {
             ),
 
     })
+    @PreAuthorize("hasAnyRole('ADMINISTRATEUR', 'MANAGER')")
     @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/{utilisateur_id}")
     public ResponseEntity<ApiResponseDto<UtilisateurResponseDto>> updateUtilisateur(
@@ -369,6 +374,7 @@ public class UtilisateurController {
             """))),
 
     })
+    @PreAuthorize("hasAuthority('UTILISATEUR_DELETE')")
     @SecurityRequirement(name = "bearerAuth")
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{utilisateur_id}")
@@ -415,7 +421,7 @@ public class UtilisateurController {
                              }
             """)))
     })
-    @SecurityRequirement(name = "bearerAuth")
+
    @PostMapping("Authentication")
    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponseDto<Map<String,String>>>Authentification(
@@ -544,6 +550,7 @@ public class UtilisateurController {
 
 
     })
+
     @SecurityRequirement(name = "bearerAuth")
      @PatchMapping(path = "profil",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
      @ResponseStatus(HttpStatus.OK)
@@ -569,7 +576,7 @@ public class UtilisateurController {
      }
 
 
-     //RECUPER LE PROFIL DE L'UTILISATEUR CONNECTE
+     //CONSULTER SON PROFIL
      @Operation( description = "Permet de récuperé le profil de l'utilisateur  ",
              summary = "récuper le profil utilisateur"
      )
@@ -625,7 +632,7 @@ public class UtilisateurController {
      }
 
 
-         // RECUPERER L'IMAGE D'UN UTILISATEUR
+         // VISUALISER L'IMAGE DE PROFIL
          @Operation( description = "Permet de récuperé l'image de profil d'un  utilisateur  ",
                  summary = "récuper l'image de profil d'un  utilisateur"
          )

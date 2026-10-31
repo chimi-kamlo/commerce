@@ -56,7 +56,7 @@ public class Utilisateur implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + TypeRole.UTILISATEUR));
+        return this.role.getLibele().getAuthorities();
     }
 
     @Override

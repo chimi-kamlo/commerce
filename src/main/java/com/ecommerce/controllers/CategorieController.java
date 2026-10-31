@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -76,6 +77,7 @@ public class CategorieController {
 
 
     })
+    @PreAuthorize("hasAuthority('CATEGORIE_CREATE')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<ApiResponseDto<CategorieResponseDto>> createCategorie(
@@ -140,6 +142,7 @@ public class CategorieController {
 
 
     })
+    @PreAuthorize("hasAuthority('CATEGORIE_READ')")
     @GetMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<ApiResponseDto<List<CategorieResponseDto>>> getAllCategorie(){
