@@ -40,7 +40,7 @@ API REST développée avec Java et Spring Boot permettant de gérer une platefor
 -> Git / GitHub
 
 ### Architecture du projet
-![swagger.PNG](docs/swagger.PNG)
+![architecture.PNG](docs/architecture.PNG)
 
 ### Prérequis
 
